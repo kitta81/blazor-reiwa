@@ -1,0 +1,41 @@
+﻿@using System;
+@using System.Globalization;
+
+<form onsubmit="@OnSubmit">
+    <div>
+        <label>
+            <input type="checkbox" bind="@IsGannen" />元年表示
+        </label>
+    </div>
+    <input type="text" bind="@InputText" />
+    <button>変換</button>
+    <div>
+        @OutputText
+    </div>
+</form>
+
+@functions {
+    public bool IsGannen { get; set; }
+
+    public string InputText { get; set; }
+
+    public string OutputText { get; set; }
+
+    public void OnSubmit()
+    {
+        var cultureInfo = new CultureInfo("ja-JP", true);
+        cultureInfo.DateTimeFormat.Calendar = new JapaneseCalendar();
+
+        var inputDate = DateTime.Parse(InputText);
+        var gengo = inputDate.ToString("gg", cultureInfo);
+        int year =  int.Parse(inputDate.ToString("yy", cultureInfo));
+
+        if (inputDate >= new DateTime(2019, 5, 1))
+        {
+            gengo = "令和";
+            year = year - 30;
+        }
+
+        OutputText = $"{gengo}{(year == 1 && IsGannen ? "元" : year.ToString())}{inputDate.ToString("年M月d日", cultureInfo)}";
+    }
+}
